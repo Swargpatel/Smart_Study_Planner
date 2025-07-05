@@ -1,0 +1,269 @@
+/* register.css
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+form {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+h2 {
+    text-align: center;
+    color: #2563eb;
+    margin-bottom: 1.5rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    outline: none;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: scale(1.02);
+}
+
+p {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 1rem;
+}
+
+a {
+    color: #2563eb;
+    text-decoration: none;
+    transition: text-decoration 0.3s;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #dc2626;
+    margin-top: 1rem;
+} */
+
+
+/* Import Poppins from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body,
+html {
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Animated gradient background */
+.register-container {
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(-45deg, #6a11cb, #2575fc, #6a11cb, #2575fc);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    padding: 1rem;
+}
+
+
+.register-form{
+    /* display: flex; */
+    flex-direction: column;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Glassmorphic form card */
+.register-form {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Title */
+.register-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2rem;
+}
+
+/* Input wrapper for floating label */
+.input-wrapper {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.register-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 1rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+}
+
+.register-input::placeholder {
+    color: transparent;
+}
+
+.register-input:focus {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.input-wrapper label {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #e0e0e0;
+    pointer-events: none;
+    transition: 0.2s ease all;
+}
+
+.register-input:focus+label,
+.register-input:not(:placeholder-shown)+label {
+    top: 0.4rem;
+    left: 0.8rem;
+    font-size: 0.75rem;
+    color: #fff;
+}
+
+/* Submit button */
+.register-button {
+    width: 100%;
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.register-button:hover {
+    box-shadow: 0 0 15px rgba(37, 117, 252, 0.6);
+    transform: scale(1.02);
+}
+
+/* Login link */
+.register-login {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #f0f0f0;
+}
+
+.register-login a {
+    color: #fff;
+    font-weight: 500;
+    text-decoration: underline;
+    transition: 0.2s;
+}
+
+.register-login a:hover {
+    color: #c0c0c0;
+}
+
+/* Message */
+.register-message {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.register-message:empty {
+    display: none;
+}
+
+.register-message.success {
+    color: #4ade80;
+    /* Green */
+}
+
+.register-message.error {
+    color: #f87171;
+    /* Red */
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+    .register-form {
+        padding: 1.5rem;
+    }
+
+    .register-title {
+        font-size: 1.75rem;
+    }
+}
