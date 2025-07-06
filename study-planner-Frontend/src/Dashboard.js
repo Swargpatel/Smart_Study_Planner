@@ -1,4 +1,5 @@
-// import './App.css';
+
+
 import './Dashboard.css'
 import React, { useState, useEffect } from 'react';
 // import axios from 'axios';
@@ -8,10 +9,20 @@ function App() {
 
     const [data, Dataset] = useState([]);
 
-    const [hours, setHours] = useState(0);
+    const [hours, setHours] = useState(() => {
+        // Get hours from localStorage if available, else undefined
+        const saved = localStorage.getItem('study_hours');
+        return saved !== null ? Number(saved) : '';
+    });
+
+    // boolean variable
+    const [lock, setLock] = useState(() => {
+        return localStorage.getItem('study_hours') !== null;
+    });
+
     const [subject, setSubject] = useState("");
     const [examDate, setExamDate] = useState(new Date());
-    const [syllabus, setSyllabus] = useState(null);
+    const [syllabus, setSyllabus] = useState("");
     const [level, setLevel] = useState("");
     const [comments, setComments] = useState("");
 
@@ -20,7 +31,16 @@ function App() {
     const [showToast, setShowToast] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
 
+    // For plan display
+    const [aiPlan, setAiPlan] = useState("");
 
+    // Save hours to localStorage whenever it changes
+    useEffect(() => {
+        if (hours !== '') {
+            localStorage.setItem('study_hours', hours);
+        }
+    }, [hours]);
+    
     useEffect(() => {
         API.get('/exam').then((response) => {
             console.log("Backend Response:", response.data);
@@ -29,34 +49,36 @@ function App() {
     }, []);
 
     const addSubject = async (e) => {
-        e.preventDefault();
-        setLoading(true);
 
-        const formData = new FormData();
-        formData.append('sub', subject);
-        formData.append('date', examDate.toISOString());
-        formData.append('syllabus', syllabus);
-        formData.append('DifficultyLevel', level);
-        formData.append('comments', comments);
+        e.preventDefault(); // prevent form reload
 
         try {
-            const response = await API.post('/exam', formData);
-            Dataset([...data, response.data]);
+        const response = await API.post('/exam', {
+            sub: subject,
+            date: examDate.toISOString(),
+            syllabus: syllabus,
+            DifficultyLevel: level,
+            comments: comments
+        });
+        console.log("✅ Server response:", response.data);
 
-            setSubject('');
-            setExamDate(new Date());
-            setSyllabus(null);
-            setLevel('');
-            setComments('');
+        Dataset([...data, response.data.data]);
 
-            // Show toast
-            setShowToast(true);
-            setTimeout(() => setShowToast(false), 3000);
-        } finally {
-            setLoading(false);
+        // Reset form fields
+        setSubject('');
+        setExamDate(new Date());
+        setSyllabus('');
+        setLevel('');
+        setComments('');
+
+        // Show toast
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+        setLoading(false);
+        } catch (error) {
+        console.error("❌ Upload failed:", error);
         }
     };
-
 
     const deleteSubject = (id) => {
         API.delete(`/exam/${id}`).then(() => {
@@ -87,11 +109,14 @@ function App() {
                             /><br></br>
 
                             <label>Syllabus:</label>
-                            <input
-                                type='file'
-                                accept='.pdf'
-                                onChange={(e) => setSyllabus(e.target.files[0])}
-                            /><br></br>
+                            <textarea
+                                value={syllabus}
+                                onChange={(e) => setSyllabus(e.target.value)}
+                                placeholder='Enter the syllabus or Topics that you want to cover'
+                                rows={11}
+                                cols={50}
+                            ></textarea><br></br>
+
 
                             <label>Difficulty Level:</label>
                             <select value={level} onChange={(e) => setLevel(e.target.value)}>
@@ -125,6 +150,21 @@ function App() {
             </div>
         )
     }
+
+    // Creating prompt to call API
+    const handleChat = async () => {
+    try {
+        const res = await API.post('/chat', {
+        prompt: "Create a table with [Date, Chapters, Tasks]",
+        hours: hours
+        });
+
+        setAiPlan(res.data.output);
+    } catch (error) {
+        console.error("Error fetching AI plan:", error);
+        setAiPlan("Failed to generate study plan.");
+    }
+    };
     return (
         <div>
             <button
@@ -154,8 +194,24 @@ function App() {
                 <input
                     type='number'
                     value={hours}
-                    onChange={(e) => setHours(e.target.value)}
+                    placeholder='Enter hours of study'
+                    disabled={lock}
+                    onChange={(e) => {
+                    setHours(e.target.value);
+                    setLock(true); // <== This ensures field becomes locked again after saving
+                }}
                 />
+                {lock && (
+                <button
+                    onClick={() => {
+                    localStorage.removeItem('study_hours'); // This clears the lock
+                    setLock(false);                         // Enable editing
+                    }}
+                    style={{ marginLeft: '10px' }}
+                >
+                    Edit
+                </button>
+                )}
             </div>
 
             <div className="add-subject">
@@ -183,66 +239,39 @@ function App() {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* {data.map((info) => (
+                    {data.map((info) => (
                         <tr key={info._id}>
                             <td>{info.sub}</td>
                             <td>{new Date(info.date).toISOString().split('T')[0]}</td>
-                            
-                            <td>{info.syllabus ? (
-                                <a href={`/${info.syllabus}`} target="_blank" rel="noopener noreferrer">
-                                    View Syllabus
-                                </a>
-                            ) : (
-                                "No syllabus uploaded"
-                            )}</td>
+                            <td>{info.syllabus}</td>
                             <td>{info.DifficultyLevel}</td>
                             <td>{info.comments}</td>
                             <td>
                                 <button onClick={() => deleteSubject(info._id)}>Delete Subject</button>
                             </td>
                         </tr>
-                    ))} */}
-
-                    {data.map((info, index) => {
-                        const isValidDate = info.date && !isNaN(new Date(info.date));
-
-                        return (
-                            <tr key={info._id || index}>
-                                <td>{info.sub}</td>
-                                <td>
-                                    {isValidDate
-                                        ? new Date(info.date).toISOString().split('T')[0]
-                                        : "Invalid date"}
-                                </td>
-                                <td>
-                                    {info.syllabus ? (
-                                        <a href={`/${info.syllabus}`} target="_blank" rel="noopener noreferrer">
-                                            View Syllabus
-                                        </a>
-                                    ) : (
-                                        "No syllabus uploaded"
-                                    )}
-                                </td>
-                                <td>{info.DifficultyLevel}</td>
-                                <td>
-                                    {Array.isArray(info.comments) ? (
-                                        info.comments.map((comment, i) => <div key={i}>{comment}</div>)
-                                    ) : (
-                                        info.comments
-                                    )}
-                                </td>
-                                <td>
-                                    <button onClick={() => deleteSubject(info._id)}>Delete Subject</button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-
-
+                        ))}
                 </tbody>
             </table>
+
+            <br /><br />
+            <div style={{ textAlign: 'center' }}>
+                <button onClick={handleChat} style={{ padding: '10px 20px', fontSize: '16px' }}>
+                Generate Smart Study Plan
+                </button>
+            </div>
+
+            <br />
+            {aiPlan && (
+                <div style={{ margin: '20px auto', width: '80%', whiteSpace: 'pre-wrap', backgroundColor: '#f4f4f4', padding: '20px', borderRadius: '10px' }}>
+                <h3>📘 Smart Study Plan</h3>
+                <div>{aiPlan}</div>
+                <p>Take screenshot of the above plan before leaving this page.</p>
+                </div>
+            )}
         </div>
     );
 }
 
 export default App;
+
