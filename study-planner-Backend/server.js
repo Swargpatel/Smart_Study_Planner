@@ -87,17 +87,24 @@ app.post("/api/chat", async (req, res) => {
             syllabusDetails += `Subject: ${subj.sub}, Exam Date: ${new Date(subj.date).toDateString()}, Difficulty: ${subj.DifficultyLevel}, Comments: ${subj.comments}, Syllabus: ${subj.syllabus}\n\n`;
         }
 
-        const finalPrompt = `Generate a smart daily study plan in table format (Date | Topics | Tasks). Study hours/day: ${hours}. 
+        const finalPrompt = `You are a study planner AI. Generate a **Markdown formatted table** for a smart daily study plan. The table should include the following columns:
 
-        Analyze the following subjects and syllabus content carefully:
-        ${syllabusDetails}
+                            | Date | Subject | Topics | Tasks |
 
-        Create a comprehensive study plan that:
-        1. Prioritizes harder subjects and chapters
-        2. Allocates more time to subjects with earlier exam dates
-        3. Includes revision sessions
-        4. Accounts for the difficulty level of each subject
-        5. Provides specific chapter/topic recommendations based on the syllabus content ${userPrompt ? `\n\nUser Prompt: ${userPrompt}` : ""}`;
+                            Study hours/day: ${hours}
+
+                            Analyze the following subjects and syllabus content:
+                            ${syllabusDetails}
+
+                            Instructions:
+                            - Group topics by subject and day.
+                            - Use realistic daily workload considering study hours.
+                            - Prioritize **harder subjects** and **earlier exam dates**.
+                            - Include **revision days**.
+                            - Keep Markdown syntax clean and aligned.
+
+                            Output only the table. After the table, add 4-5 important general tips in bullet points like break suggestions, recall, etc.
+                            ${userPrompt ? `\n\nUser Prompt: ${userPrompt}` : ""}`;
 
         const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
 

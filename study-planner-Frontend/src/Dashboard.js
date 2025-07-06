@@ -5,6 +5,10 @@ import React, { useState, useEffect } from 'react';
 // import axios from 'axios';
 import API from './services/api';
 
+// for adjusting the AI output Table
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 function App() {
 
     const [data, Dataset] = useState([]);
@@ -243,7 +247,7 @@ function App() {
                         <tr key={info._id}>
                             <td>{info.sub}</td>
                             <td>{new Date(info.date).toISOString().split('T')[0]}</td>
-                            <td>{info.syllabus}</td>
+                            <td>Syllabus Submitted</td>
                             <td>{info.DifficultyLevel}</td>
                             <td>{info.comments}</td>
                             <td>
@@ -263,10 +267,10 @@ function App() {
 
             <br />
             {aiPlan && (
-                <div style={{ margin: '20px auto', width: '80%', whiteSpace: 'pre-wrap', backgroundColor: '#f4f4f4', padding: '20px', borderRadius: '10px' }}>
+                <div style={{ margin: '20px auto', width: '90%', backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '10px', overflowX: 'auto' }}>
                 <h3>📘 Smart Study Plan</h3>
-                <div>{aiPlan}</div>
-                <p>Take screenshot of the above plan before leaving this page.</p>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiPlan}</ReactMarkdown>
+                <p>📸 Take screenshot of the above plan before leaving this page.</p>
                 </div>
             )}
         </div>
