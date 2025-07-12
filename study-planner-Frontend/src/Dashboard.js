@@ -44,7 +44,7 @@ function App() {
             localStorage.setItem('study_hours', hours);
         }
     }, [hours]);
-    
+
     useEffect(() => {
         API.get('/exam').then((response) => {
             console.log("Backend Response:", response.data);
@@ -57,30 +57,30 @@ function App() {
         e.preventDefault(); // prevent form reload
 
         try {
-        const response = await API.post('/exam', {
-            sub: subject,
-            date: examDate.toISOString(),
-            syllabus: syllabus,
-            DifficultyLevel: level,
-            comments: comments
-        });
-        console.log("✅ Server response:", response.data);
+            const response = await API.post('/exam', {
+                sub: subject,
+                date: examDate.toISOString(),
+                syllabus: syllabus,
+                DifficultyLevel: level,
+                comments: comments
+            });
+            console.log("✅ Server response:", response.data);
 
-        Dataset([...data, response.data.data]);
+            Dataset([...data, response.data.data]);
 
-        // Reset form fields
-        setSubject('');
-        setExamDate(new Date());
-        setSyllabus('');
-        setLevel('');
-        setComments('');
+            // Reset form fields
+            setSubject('');
+            setExamDate(new Date());
+            setSyllabus('');
+            setLevel('');
+            setComments('');
 
-        // Show toast
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
-        setLoading(false);
+            // Show toast
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 3000);
+            setLoading(false);
         } catch (error) {
-        console.error("❌ Upload failed:", error);
+            console.error("❌ Upload failed:", error);
         }
     };
 
@@ -157,17 +157,17 @@ function App() {
 
     // Creating prompt to call API
     const handleChat = async () => {
-    try {
-        const res = await API.post('/chat', {
-        prompt: "Create a table with [Date, Chapters, Tasks]",
-        hours: hours
-        });
+        try {
+            const res = await API.post('/chat', {
+                prompt: "Create a table with [Date, Chapters, Tasks]",
+                hours: hours
+            });
 
-        setAiPlan(res.data.output);
-    } catch (error) {
-        console.error("Error fetching AI plan:", error);
-        setAiPlan("Failed to generate study plan.");
-    }
+            setAiPlan(res.data.output);
+        } catch (error) {
+            console.error("Error fetching AI plan:", error);
+            setAiPlan("Failed to generate study plan.");
+        }
     };
     return (
         <div>
@@ -201,20 +201,20 @@ function App() {
                     placeholder='Enter hours of study'
                     disabled={lock}
                     onChange={(e) => {
-                    setHours(e.target.value);
-                    setLock(true); // <== This ensures field becomes locked again after saving
-                }}
+                        setHours(e.target.value);
+                        setLock(true); // <== This ensures field becomes locked again after saving
+                    }}
                 />
                 {lock && (
-                <button
-                    onClick={() => {
-                    localStorage.removeItem('study_hours'); // This clears the lock
-                    setLock(false);                         // Enable editing
-                    }}
-                    style={{ marginLeft: '10px' }}
-                >
-                    Edit
-                </button>
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('study_hours'); // This clears the lock
+                            setLock(false);                         // Enable editing
+                        }}
+                        style={{ marginLeft: '10px' }}
+                    >
+                        Edit
+                    </button>
                 )}
             </div>
 
@@ -254,23 +254,50 @@ function App() {
                                 <button onClick={() => deleteSubject(info._id)}>Delete Subject</button>
                             </td>
                         </tr>
-                        ))}
+                    ))}
                 </tbody>
             </table>
 
             <br /><br />
-            <div style={{ textAlign: 'center' }}>
-                <button onClick={handleChat} style={{ padding: '10px 20px', fontSize: '16px' }}>
-                Generate Smart Study Plan
+            <div className="generate-plan-section">
+                <button onClick={handleChat} className="generate-plan-btn">
+                    <span className="btn-icon">🧠</span>
+                    Generate Smart Study Plan
+                    <span className="btn-arrow">→</span>
                 </button>
             </div>
 
             <br />
             {aiPlan && (
-                <div style={{ margin: '20px auto', width: '90%', backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '10px', overflowX: 'auto' }}>
-                <h3>📘 Smart Study Plan</h3>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiPlan}</ReactMarkdown>
-                <p>📸 Take screenshot of the above plan before leaving this page.</p>
+                <div className="ai-plan-container">
+                    <div className="ai-plan-header">
+                        <h3>📘 Your Smart Study Plan</h3>
+                        <div className="plan-actions">
+                            <button
+                                onClick={() => window.print()}
+                                className="action-btn print-btn"
+                                title="Print this plan"
+                            >
+                                🖨️ Print
+                            </button>
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(aiPlan);
+                                    alert('Plan copied to clipboard!');
+                                }}
+                                className="action-btn copy-btn"
+                                title="Copy to clipboard"
+                            >
+                                📋 Copy
+                            </button>
+                        </div>
+                    </div>
+                    <div className="ai-plan-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiPlan}</ReactMarkdown>
+                    </div>
+                    <div className="ai-plan-footer">
+                        <p className="save-reminder">💡 <strong>Tip:</strong> Save this plan by taking a screenshot or printing it for offline reference.</p>
+                    </div>
                 </div>
             )}
         </div>
