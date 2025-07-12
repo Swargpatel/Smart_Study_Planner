@@ -8,40 +8,82 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+console.log("GEMINI_API_KEY loaded:", process.env.GEMINI_API_KEY ? "Yes" : "No");
+console.log("API Key length:", process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.length : "undefined");
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+async function validateGeminiAPI() {
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent("Hello, this is a test message.");
+        console.log(" Gemini API validation successful!");
+        return true;
+    } catch (error) {
+        console.error("Gemini API validation failed:", error.message);
+        return false;
+    }
+}
+
+validateGeminiAPI();
+
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // To create API call
 import axios from "axios";
+import authRoutes from './routes/authRoutes.js';
 
 app.use(bodyParser.json());
 app.use(cors());
-app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/auth', authRoutes);
 
-mongoose.connect(process.env.MONGO_URI);
+// MongoDB connection with better error handling
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+        console.log("Connected to MongoDB successfully");
+        console.log("Database:", mongoose.connection.db.databaseName);
+    })
+    .catch((error) => {
+        console.error("MongoDB connection error:", error.message);
+        console.error("Full error:", error);
+        process.exit(1);
+    });
+
+// Monitor connection events
+mongoose.connection.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected');
+});
+
 const subjectSchema = new mongoose.Schema({
-    sub: String, 
-    date: Date, 
-    syllabus: String, 
-    DifficultyLevel: String, 
-    comments: String 
+    sub: String,
+    date: Date,
+    syllabus: String,
+    DifficultyLevel: String,
+    comments: String
 })
-const SubjectSheet = mongoose.model('SubjectSheet',subjectSchema);
+const SubjectSheet = mongoose.model('SubjectSheet', subjectSchema);
 
 //GET: Fetch all Subject Data from database
-app.get('/api/exam',async(req,res) => {
-    try{
+app.get('/api/exam', async (req, res) => {
+    try {
         const subjects = await SubjectSheet.find();
         res.json(subjects);
-    }catch(error){
+    } catch (error) {
         console.error(error);
-        res.status(500).json({error: 'Server error'});
+        res.status(500).json({ error: 'Server error' });
     }
 })
 
 //POST: Add a new Subject to the database
-app.post('/api/exam', async(req,res) => {
-    try{
+app.post('/api/exam', async (req, res) => {
+    try {
         const newSubject = new SubjectSheet({
             sub: req.body.sub,
             date: req.body.date,
@@ -52,26 +94,26 @@ app.post('/api/exam', async(req,res) => {
 
         const savedSubject = await newSubject.save();
         res.json({ message: 'Subject added successfully', data: savedSubject });
-    }catch(error){
+    } catch (error) {
         console.error(error);
-        res.status(500).json({error: 'Server error'});
+        res.status(500).json({ error: 'Server error' });
     }
 })
 
 // DELETE: Remove a Data
-app.delete('/api/exam/:id',async(req,res) => {
-    try{
+app.delete('/api/exam/:id', async (req, res) => {
+    try {
         const deletedSubject = await SubjectSheet.findByIdAndDelete(req.params.id);
         res.json(deletedSubject);
-    }catch(error){
+    } catch (error) {
         console.error(error);
-        res.status(500).json({error: 'Server error'});
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
-// To create API call to Gemini AI
-import { GoogleGenerativeAI } from "@google/generative-ai";
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+
+validateGeminiAPI();
 
 app.post("/api/chat", async (req, res) => {
     const { prompt: userPrompt, hours } = req.body;
@@ -106,9 +148,12 @@ app.post("/api/chat", async (req, res) => {
                             Output only the table. After the table, add 4-5 important general tips in bullet points like break suggestions, recall, etc.
                             ${userPrompt ? `\n\nUser Prompt: ${userPrompt}` : ""}`;
 
-        const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         console.log('Sending prompt to Gemini API...');
+        console.log('Model:', model.model);
+        console.log('API Key (first 10 chars):', process.env.GEMINI_API_KEY.substring(0, 10));
+
         const result = await model.generateContent(finalPrompt);
         const text = result.response.text();
 
@@ -122,4 +167,4 @@ app.post("/api/chat", async (req, res) => {
     }
 });
 
-app.listen(PORT,()=>{console.log("Server is running on port", PORT)});
+app.listen(PORT, () => { console.log("Server is running on port", PORT) });

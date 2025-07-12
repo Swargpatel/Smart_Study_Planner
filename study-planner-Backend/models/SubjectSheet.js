@@ -1,10 +1,11 @@
-const moongose = require('mongoose');
-const subjectSchema = new moongose.Schema({
-    sub: String, 
-    date: Date, 
-    syllabus: String, 
-    DifficultyLevel: String, 
-    comments: String 
+import mongoose from 'mongoose';
+
+const subjectSchema = new mongoose.Schema({
+    sub: String,
+    date: Date,
+    syllabus: String,
+    DifficultyLevel: String,
+    comments: String
 });
 
-module.exports = moongose.model('SubjectSheet', subjectSchema);
+export default mongoose.model('SubjectSheet', subjectSchema);

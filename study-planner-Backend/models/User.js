@@ -1,5 +1,6 @@
-const moongose = require('mongoose');
-const userSchema = new moongose.Schema({
+import mongoose from 'mongoose';
+
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -13,7 +14,7 @@ const userSchema = new moongose.Schema({
         type: String,
         required: true
     },
-    role:{
+    role: {
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
@@ -24,4 +25,4 @@ const userSchema = new moongose.Schema({
     // }
 });
 
-module.exports = moongose.model('User', userSchema);
+export default mongoose.model('User', userSchema);
