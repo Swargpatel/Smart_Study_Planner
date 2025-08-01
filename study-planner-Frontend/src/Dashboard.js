@@ -30,6 +30,8 @@ function App() {
         return saved !== null ? Number(saved) : '';
     });
 
+    
+
     // Removed duplicate handleChat function
 
     // boolean variable
@@ -57,11 +59,20 @@ function App() {
     // ...
     // const [aiPlan, setAiPlan] = useState(""); 
     // Save hours to localStorage whenever it changes
+    
+    // useEffect(() => {
+    //     if (hours !== '') {
+    //         localStorage.setItem('study_hours', hours);
+    //     }
+    // }, [hours]);
+
+    //! change code
     useEffect(() => {
-        if (hours !== '') {
-            localStorage.setItem('study_hours', hours);
-        }
-    }, [hours]);
+    if (hours !== '' && /^\d+$/.test(hours)) {
+        localStorage.setItem('study_hours', hours);
+    }
+}, []);
+
 
     useEffect(() => {
         API.get('/exam').then((response) => {
