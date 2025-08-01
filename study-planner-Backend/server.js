@@ -40,6 +40,13 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use('/api/auth', authRoutes);
 
+
+app.use(cors({
+    origin: "https://your-frontend-site.netlify.app", // replace with your real Netlify URL
+    credentials: true,
+}));
+
+
 // MongoDB connection with better error handling
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
