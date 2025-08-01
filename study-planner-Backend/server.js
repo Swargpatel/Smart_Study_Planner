@@ -42,7 +42,7 @@ app.use('/api/auth', authRoutes);
 
 
 app.use(cors({
-    origin: "https://your-frontend-site.netlify.app", // replace with your real Netlify URL
+    origin: "https://splendorous-marshmallow-0b7a70.netlify.app", // replace with your real Netlify URL
     credentials: true,
 }));
 
