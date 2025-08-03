@@ -10,13 +10,13 @@ import remarkGfm from 'remark-gfm';
 // SVG Icons Components
 const PrintIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/>
+        <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" />
     </svg>
 );
 
 const CopyIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
     </svg>
 );
 
@@ -30,7 +30,7 @@ function App() {
         return saved !== null ? Number(saved) : '';
     });
 
-    
+
 
     // Removed duplicate handleChat function
 
@@ -59,7 +59,7 @@ function App() {
     // ...
     // const [aiPlan, setAiPlan] = useState(""); 
     // Save hours to localStorage whenever it changes
-    
+
     // useEffect(() => {
     //     if (hours !== '') {
     //         localStorage.setItem('study_hours', hours);
@@ -68,10 +68,10 @@ function App() {
 
     //! change code
     useEffect(() => {
-    if (hours !== '' && /^\d+$/.test(hours)) {
-        localStorage.setItem('study_hours', hours);
-    }
-}, []);
+        if (hours !== '' && /^\d+$/.test(hours)) {
+            localStorage.setItem('study_hours', hours);
+        }
+    }, []);
 
 
     useEffect(() => {
@@ -183,7 +183,7 @@ function App() {
         )
     }
 
-    // Creating prompt to call API with timeout warning
+    //? Creating prompt to call API with timeout warning
     const handleChat = async () => {
         setAiLoading(true); // Set loading to true
         setAiPlan(""); // Clear previous plan
@@ -204,6 +204,45 @@ function App() {
             setAiLoading(false);
         }
     };
+
+    //!change code
+    // const handleChat = async () => {
+    //     setAiLoading(true);
+    //     setAiPlan("");
+    //     setTimeoutWarning(false);
+    //     const timeoutId = setTimeout(() => setTimeoutWarning(true), 10000);
+
+    //     // Construct the dynamic prompt
+    //     let prompt = `I need a smart study plan. I can study for ${hours} hours per day. `;
+    //     prompt += `Please create a detailed study plan in a Markdown table with the columns [Date, Subject, Chapters/Topics, Tasks]. `;
+
+    //     if (data.length > 0) {
+    //         prompt += `Here are my subjects and details:\n\n`;
+    //         data.forEach((subjectInfo) => {
+    //             prompt += `Subject: ${subjectInfo.sub}\n`;
+    //             prompt += `Exam Date: ${new Date(subjectInfo.date).toISOString().split('T')[0]}\n`;
+    //             prompt += `Syllabus: ${subjectInfo.syllabus}\n`;
+    //             prompt += `Difficulty Level: ${subjectInfo.DifficultyLevel}\n`;
+    //             prompt += `Comments: ${subjectInfo.comments || 'No specific comments'}\n\n`;
+    //         });
+    //     } else {
+    //         prompt += `I have not added any subjects yet.`;
+    //     }
+
+    //     try {
+    //         const res = await API.post('/chat', {
+    //             prompt: prompt,
+    //             hours: hours
+    //         });
+    //         setAiPlan(res.data.output);
+    //     } catch (error) {
+    //         console.error("Error fetching AI plan:", error);
+    //         setAiPlan("Failed to generate study plan. Please try again.");
+    //     } finally {
+    //         clearTimeout(timeoutId);
+    //         setAiLoading(false);
+    //     }
+    // };
 
     return (
         <div className="main-container">
@@ -283,8 +322,8 @@ function App() {
             )}
 
             <div className="generate-plan-container">
-                <button 
-                    className="generate-plan-btn" 
+                <button
+                    className="generate-plan-btn"
                     onClick={handleChat}
                     disabled={aiLoading} // Disable button while loading
                 >
